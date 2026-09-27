@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Awards</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0F0C1F;
+    --panel:#1B1638;
+    --panel-2:#241D49;
+    --line:#392f66;
+    --paper:#F5F1FF;
+    --paper-dim:#B9B0DE;
+    --gold:#F2B33D;
+    --gold-ink:#3A2600;
+    --pink:#FF5D8F;
+    --green:#4ADE80;
+    --red:#FF6B6B;
+    --shadow-hard: 6px 6px 0 rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(circle at 15% -10%, #2a2260 0%, transparent 55%),
+      radial-gradient(circle at 110% 10%, #3a1f4d 0%, transparent 45%),
+      var(--ink);
+    color:var(--paper);
+    font-family:'Space Grotesk', sans-serif;
+    min-height:100%;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+    overflow-x:hidden;
+  }
+  .display{font-family:'Bebas Neue', sans-serif; letter-spacing:0.02em;}
+  #app{
+    max-width:560px;
+    margin:0 auto;
+    padding:20px 18px 90px;
+    min-height:100vh;
+    position:relative;
+  }
+  .screen{animation:rise .35s ease both;}
+  @keyframes rise{from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);}}
+  @media (prefers-reduced-motion: reduce){ .screen{animation:none;} }
+
+  .brand{
+    display:flex; align-items:center; gap:10px; margin-bottom:26px;
+  }
+  .brand .ticket-mark{
+    width:34px;height:34px;border-radius:8px;
+    background:var(--gold); color:var(--gold-ink);
+    display:flex;align-items:center;justify-content:center;
+    font-size:20px; transform:rotate(-8deg);
+    box-shadow:var(--shadow-hard);
+  }
+  .brand h1{font-family:'Bebas Neue'; font-size:28px; margin:0; letter-spacing:0.03em;}
+  .brand span{color:var(--gold);}
+
+  .card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:24px 20px;
+    position:relative;
+  }
+  .ticket{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:16px;
+    position:relative;
+    padding:22px 20px;
+  }
+  .ticket::before, .ticket::after{
+    content:"";
+    position:absolute; top:50%; transform:translateY(-50%);
+    width:20px; height:20px; background:var(--ink); border-radius:50%;
+  }
+  .ticket::before{ left:-10px; }
+  .ticket::after{ right:-10px; }
+
+  label{display:block; font-size:13px; color:var(--paper-dim); margin:0 0 6px; font-weight:600;}
+  input[type=text]{
+    width:100%;
+    background:var(--panel-2);
+    border:2px solid var(--line);
+    border-radius:12px;
+    padding:14px 14px;
+    color:var(--paper);
+    font-family:'Space Grotesk';
+    font-size:16px;
+    outline:none;
+    transition:border-color .15s;
+  }
+  input[type=text]:focus{border-color:var(--gold);}
+  input[type=text]::placeholder{color:#6f6597;}
+
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    border:none; border-radius:12px;
+    padding:14px 20px;
+    font-family:'Space Grotesk'; font-weight:700; font-size:15px;
+    cursor:pointer;
+    box-shadow:var(--shadow-hard);
+    transition:transform .1s;
+    width:100%;
+  }
+  .btn:active{transform:translate(3px,3px); box-shadow:2px 2px 0 rgba(0,0,0,.35);}
+  .btn-gold{background:var(--gold); color:var(--gold-ink);}
+  .btn-pink{background:var(--pink); color:#3a0018;}
+  .btn-outline{background:transparent; color:var(--paper); border:2px solid var(--line); box-shadow:none;}
+  .btn-outline:active{transform:none;}
+  .btn-sm{padding:9px 14px; font-size:13px; width:auto; box-shadow:none;}
+  .btn[disabled]{opacity:.4; cursor:not-allowed;}
+  .btn-row{display:flex; gap:10px;}
+
+  .muted{color:var(--paper-dim); font-size:14px; line-height:1.5;}
+  .center{text-align:center;}
+  .stack{display:flex; flex-direction:column; gap:14px;}
+  .row{display:flex; align-items:center; justify-content:space-between; gap:10px;}
+
+  .code-display{
+    font-family:'Bebas Neue';
+    font-size:56px;
+    letter-spacing:0.12em;
+    color:var(--gold);
+    text-align:center;
+    padding:14px 0;
+  }
+
+  .pill{
+    display:inline-flex; align-items:center; gap:6px;
+    background:var(--panel-2); border:1px solid var(--line);
+    border-radius:999px; padding:6px 12px; font-size:13px; font-weight:600;
+  }
+  .dot{width:8px;height:8px;border-radius:50%; background:var(--green);}
+  .dot.off{background:#584d8c;}
+
+  .player-list{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px;}
+  .player-row{
+    display:flex; align-items:center; justify-content:space-between;
+    background:var(--panel-2); border:1px solid var(--line);
+    border-radius:12px; padding:10px 14px; font-weight:600;
+  }
+  .player-row .tag{font-size:11px; color:var(--gold); font-weight:700; margin-left:6px;}
+  .kick{background:none; border:none; color:var(--red); font-size:12px; font-weight:700; cursor:pointer; padding:4px 8px;}
+
+  .prompt-input-row{display:flex; gap:8px;}
+  .prompt-input-row input{flex:1;}
+  .icon-btn{
+    background:var(--panel-2); border:1px solid var(--line); color:var(--paper);
+    border-radius:10px; width:46px; font-size:20px; cursor:pointer;
+  }
+  .my-prompts{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px;}
+  .my-prompts li{
+    background:var(--panel-2); border:1px solid var(--line); border-radius:10px;
+    padding:10px 12px; display:flex; justify-content:space-between; align-items:center; gap:8px;
+    font-size:14px;
+  }
+  .my-prompts li button{background:none; border:none; color:var(--paper-dim); cursor:pointer; font-size:16px;}
+
+  .progress-track{height:8px; background:var(--panel-2); border-radius:99px; overflow:hidden; border:1px solid var(--line);}
+  .progress-fill{height:100%; background:var(--gold); transition:width .3s ease;}
+
+  .award-title-wrap{text-align:center; padding:10px 0 4px;}
+  .eyebrow-emoji{font-size:34px;}
+  .award-title{
+    font-family:'Bebas Neue'; font-size:38px; line-height:1.05;
+    color:var(--paper); margin:8px 0 2px;
+  }
+  .award-sub{color:var(--paper-dim); font-size:13px;}
+
+  .vote-grid{display:flex; flex-direction:column; gap:10px; margin-top:16px;}
+  .vote-btn{
+    background:var(--panel); border:2px solid var(--line); color:var(--paper);
+    border-radius:14px; padding:16px; font-family:'Space Grotesk'; font-weight:700; font-size:16px;
+    cursor:pointer; text-align:left; display:flex; justify-content:space-between; align-items:center;
+  }
+  .vote-btn.selected{border-color:var(--gold); background:rgba(242,179,61,0.12); color:var(--gold);}
+  .vote-btn:active{transform:translate(2px,2px);}
+
+  .reveal-winner{
+    text-align:center; padding:26px 10px;
+  }
+  .trophy{font-size:64px; display:block; margin-bottom:6px;}
+  .winner-name{font-family:'Bebas Neue'; font-size:52px; color:var(--gold); line-height:1;}
+  .tally-row{display:flex; justify-content:space-between; padding:8px 4px; border-bottom:1px dashed var(--line); font-size:14px;}
+  .tally-row:last-child{border-bottom:none;}
+
+  .admin-fab{
+    position:fixed; bottom:calc(20px + env(safe-area-inset-bottom,0px)); right:18px;
+    width:52px; height:52px; border-radius:50%;
+    background:var(--pink); color:#3a0018; border:none; font-size:22px;
+    box-shadow:var(--shadow-hard); cursor:pointer; z-index:20;
+  }
+  .admin-sheet{
+    position:fixed; inset:0; background:rgba(6,4,18,0.7); z-index:30;
+    display:flex; align-items:flex-end; justify-content:center;
+  }
+  .admin-panel{
+    background:var(--panel); border-top:2px solid var(--pink);
+    border-radius:22px 22px 0 0; width:100%; max-width:560px;
+    max-height:80vh; overflow-y:auto;
+    padding:20px 20px calc(24px + env(safe-area-inset-bottom,0px));
+  }
+  .admin-panel h3{font-family:'Bebas Neue'; font-size:24px; margin:0 0 4px; color:var(--pink);}
+  .admin-section{margin-top:18px;}
+  .admin-section h4{font-size:12px; text-transform:uppercase; letter-spacing:.08em; color:var(--paper-dim); margin:0 0 8px;}
+  .close-x{position:absolute; top:14px; right:16px; background:none; border:none; color:var(--paper-dim); font-size:22px; cursor:pointer;}
+
+  .toast{
+    position:fixed; top:calc(14px + env(safe-area-inset-top,0px)); left:50%; transform:translateX(-50%);
+    background:var(--panel-2); border:1px solid var(--gold); color:var(--paper);
+    padding:10px 18px; border-radius:99px; font-size:13px; font-weight:600; z-index:50;
+    box-shadow:var(--shadow-hard);
+  }
+  .final-list{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px;}
+  .final-list li{
+    background:var(--panel-2); border:1px solid var(--line); border-radius:14px; padding:14px;
+  }
+  .final-list .ft{color:var(--paper-dim); font-size:12px; margin-bottom:4px;}
+  .final-list .fn{font-family:'Bebas Neue'; font-size:24px; color:var(--gold);}
+
+  a.linklike{color:var(--gold); cursor:pointer; text-decoration:underline; font-weight:600;}
+
+  .made-by{
+    position:fixed; bottom:calc(8px + env(safe-area-inset-bottom,0px)); left:0; right:0;
+    text-align:center; font-size:11px; color:var(--paper-dim); opacity:0.6;
+    pointer-events:none; z-index:5;
+  }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="made-by">made by danibanani :3</div>
+
+<!-- Firebase (self-hosted friend project — see README.md) -->
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+<script>
+/* ====================== CONFIG ======================
+   Paste YOUR Firebase project's config below.
+   See README.md for the 5-minute free setup.
+======================================================= */
+const firebaseConfig = {
+  apiKey: "AIzaSyAGy3yxTFkbkduxMBmnkSAgTdtsOIfBkR0",
+  authDomain: "friends-awards.firebaseapp.com",
+  databaseURL: "https://friends-awards-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "friends-awards",
+  storageBucket: "friends-awards.firebasestorage.app",
+  messagingSenderId: "64379534109",
+  appId: "1:64379534109:web:2f3d5525839e385ebdfff4"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+/* ====================== STATE ====================== */
+const AWARD_EMOJI = ["🏆","🎖️","🥇","👑","🔥","🎯","😭","💀","🚨","🎬","🕶️","🍿"];
+let me = {
+  id: localStorage.getItem('awp_pid') || null,
+  name: localStorage.getItem('awp_name') || '',
+  room: localStorage.getItem('awp_room') || '',
+};
+let room = null;          // live room object from Firebase
+let unsub = null;         // current db listener detach fn
+let myVoteLocal = null;   // locally selected vote before it's confirmed
+let adminOpen = false;
+
+function uid(){
+  return 'p_' + Math.random().toString(36).slice(2,10);
+}
+function roomCode(){
+  const letters = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+  let c = '';
+  for(let i=0;i<4;i++) c += letters[Math.floor(Math.random()*letters.length)];
+  return c;
+}
+function saveMe(){
+  localStorage.setItem('awp_pid', me.id || '');
+  localStorage.setItem('awp_name', me.name || '');
+  localStorage.setItem('awp_room', me.room || '');
+}
+function toast(msg){
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(), 2200);
+}
+function isHost(){
+  return room && room.hostId === me.id;
+}
+function activePlayers(){
+  if(!room || !room.players) return [];
+  return Object.entries(room.players)
+    .filter(([id,p])=>p && !p.kicked)
+    .map(([id,p])=>({id, ...p}));
+}
+
+/* ====================== DB WATCH ====================== */
+function watchRoom(code){
+  if(unsub) unsub();
+  const ref = db.ref('rooms/' + code);
+  const cb = (snap)=>{
+    const val = snap.val();
+    if(!val){
+      room = null;
+      render();
+      return;
+    }
+    room = val;
+    // if I've been kicked, boot me out locally
+    if(room.players && me.id && room.players[me.id] && room.players[me.id].kicked){
+      toast("You were removed from the room.");
+      leaveRoom();
+      return;
+    }
+    render();
+  };
+  ref.on('value', cb);
+  unsub = ()=>ref.off('value', cb);
+}
+function roomRef(){ return db.ref('rooms/' + me.room); }
+
+/* ====================== ACTIONS ====================== */
+function hostRoom(name){
+  me.id = uid();
+  me.name = name.trim();
+  const code = roomCode();
+  me.room = code;
+  saveMe();
+  db.ref('rooms/' + code).set({
+    createdAt: Date.now(),
+    hostId: me.id,
+    phase: 'lobby',
+    settings: { promptsPerPlayer: 2 },
+    players: { [me.id]: { name: me.name, joinedAt: Date.now(), kicked: false } },
+    prompts: {},
+    votes: {},
+    results: {},
+    currentIndex: 0
+  }).then(()=>watchRoom(code));
+}
+
+function joinRoom(name, code){
+  code = code.trim().toUpperCase();
+  const ref = db.ref('rooms/' + code);
+  ref.get().then(snap=>{
+    if(!snap.exists()){
+      toast("No room with that code.");
+      return;
+    }
+    me.id = uid();
+    me.name = name.trim();
+    me.room = code;
+    saveMe();
+    ref.child('players/' + me.id).set({ name: me.name, joinedAt: Date.now(), kicked:false })
+      .then(()=>watchRoom(code));
+  });
+}
+
+function leaveRoom(){
+  if(unsub) unsub();
+  room = null;
+  me = { id:null, name:'', room:'' };
+  localStorage.removeItem('awp_pid');
+  localStorage.removeItem('awp_room');
+  render();
+}
+
+function startGame(promptsPerPlayer){
+  roomRef().update({
+    phase: 'submit',
+    'settings/promptsPerPlayer': promptsPerPlayer
+  });
+}
+
+function addPrompt(text){
+  text = text.trim();
+  if(!text) return;
+  const id = 'pr_' + Math.random().toString(36).slice(2,9);
+  roomRef().child('prompts/' + id).set({ text, authorId: me.id });
+}
+function removePrompt(id){
+  roomRef().child('prompts/' + id).remove();
+}
+function myPromptCount(){
+  if(!room || !room.prompts) return 0;
+  return Object.values(room.prompts).filter(p=>p.authorId===me.id).length;
+}
+function everyonePromptsDone(){
+  const per = room.settings?.promptsPerPlayer || 2;
+  const players = activePlayers();
+  const counts = {};
+  Object.values(room.prompts||{}).forEach(p=>{ counts[p.authorId] = (counts[p.authorId]||0)+1; });
+  return players.every(pl => (counts[pl.id]||0) >= per);
+}
+
+function beginVoting(){
+  // shuffle prompt order, reset index
+  const ids = Object.keys(room.prompts||{});
+  for(let i=ids.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [ids[i],ids[j]] = [ids[j],ids[i]];
+  }
+  roomRef().update({
+    phase: 'vote',
+    promptOrder: ids,
+    currentIndex: 0
+  });
+}
+
+function currentPrompt(){
+  if(!room || !room.promptOrder) return null;
+  const id = room.promptOrder[room.currentIndex];
+  return id ? { id, ...room.prompts[id] } : null;
+}
+
+function castVote(targetId){
+  const p = currentPrompt();
+  if(!p) return;
+  myVoteLocal = targetId;
+  roomRef().child(`votes/${p.id}/${me.id}`).set(targetId);
+  render();
+}
+function votesForCurrent(){
+  const p = currentPrompt();
+  if(!p || !room.votes || !room.votes[p.id]) return {};
+  return room.votes[p.id];
+}
+function allVoted(){
+  const v = votesForCurrent();
+  return activePlayers().every(pl => v[pl.id]);
+}
+
+function revealCurrent(){
+  const p = currentPrompt();
+  if(!p) return;
+  const v = votesForCurrent();
+  const tally = {};
+  Object.values(v).forEach(targetId=>{ tally[targetId] = (tally[targetId]||0)+1; });
+  let winnerId = null, max = -1;
+  Object.entries(tally).forEach(([pid,count])=>{
+    if(count>max){ max=count; winnerId=pid; }
+  });
+  roomRef().child('results/' + p.id).set({
+    winnerId: winnerId || null,
+    tally
+  }).then(()=>{
+    roomRef().update({ phase: 'reveal' });
+  });
+}
+
+function nextAward(){
+  const nextIndex = room.currentIndex + 1;
+  if(nextIndex >= room.promptOrder.length){
+    roomRef().update({ phase: 'end' });
+  } else {
+    myVoteLocal = null;
+    roomRef().update({ phase: 'vote', currentIndex: nextIndex });
+  }
+}
+
+function forceSkipPrompt(){
+  // host removes current prompt entirely and moves on, no reveal
+  const p = currentPrompt();
+  if(!p) return;
+  nextAward();
+}
+
+function kickPlayer(pid){
+  if(!confirm("Remove this player from the game?")) return;
+  roomRef().child('players/' + pid + '/kicked').set(true);
+}
+
+function resetGame(){
+  if(!confirm("Reset and play again with the same group?")) return;
+  roomRef().update({
+    phase:'lobby', prompts:{}, votes:{}, results:{}, currentIndex:0, promptOrder:null
+  });
+}
+
+function endGameFully(){
+  if(!confirm("End the game and delete this room for everyone?")) return;
+  roomRef().remove();
+  leaveRoom();
+}
+
+/* ====================== RENDER ====================== */
+function el(html){
+  const d = document.createElement('div');
+  d.innerHTML = html.trim();
+  return d.firstElementChild;
+}
+function emojiFor(seed){
+  let h=0; for(const c of seed) h = (h*31 + c.charCodeAt(0))%AWARD_EMOJI.length;
+  return AWARD_EMOJI[Math.abs(h)];
+}
+
+function render(){
+  const app = document.getElementById('app');
+  app.innerHTML = '';
+
+  if(!room){
+    app.appendChild(renderLanding());
+    return;
+  }
+
+  const wrap = document.createElement('div');
+  wrap.appendChild(renderBrand());
+
+  switch(room.phase){
+    case 'lobby': wrap.appendChild(renderLobby()); break;
+    case 'submit': wrap.appendChild(renderSubmit()); break;
+    case 'vote': wrap.appendChild(renderVote()); break;
+    case 'reveal': wrap.appendChild(renderReveal()); break;
+    case 'end': wrap.appendChild(renderEnd()); break;
+    default: wrap.appendChild(renderLobby());
+  }
+  app.appendChild(wrap);
+
+  if(isHost()){
+    app.appendChild(renderAdminFab());
+    if(adminOpen) app.appendChild(renderAdminSheet());
+  }
+}
+
+function renderBrand(){
+  return el(`
+    <div class="brand">
+      <div class="ticket-mark">🏆</div>
+      <h1>THE <span>AWARDS</span></h1>
+    </div>
+  `);
+}
+
+function renderLanding(){
+  const c = el(`
+    <div class="screen stack">
+      <div class="brand">
+        <div class="ticket-mark">🏆</div>
+        <h1>THE <span>AWARDS</span></h1>
+      </div>
+      <p class="muted">A superlative-voting party game for your friend group. Everyone writes the awards. Everyone votes who fits. Nobody knows who wrote what.</p>
+      <div class="card stack">
+        <div>
+          <label>Your name</label>
+          <input type="text" id="nameInput" placeholder="e.g. Sam" maxlength="20">
+        </div>
+        <div>
+          <label>Room code (leave blank to host)</label>
+          <input type="text" id="codeInput" placeholder="e.g. WXYZ" maxlength="4" style="text-transform:uppercase">
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-outline" id="hostBtn">Host new game</button>
+          <button class="btn btn-gold" id="joinBtn">Join party</button>
+        </div>
+      </div>
+    </div>
+  `);
+  c.querySelector('#hostBtn').onclick = ()=>{
+    const name = c.querySelector('#nameInput').value;
+    if(!name.trim()) return toast("Enter your name first.");
+    hostRoom(name);
+  };
+  c.querySelector('#joinBtn').onclick = ()=>{
+    const name = c.querySelector('#nameInput').value;
+    const code = c.querySelector('#codeInput').value;
+    if(!name.trim()) return toast("Enter your name first.");
+    if(!code.trim()) return toast("Enter the room code, or tap Host new game.");
+    joinRoom(name, code);
+  };
+  return c;
+}
+
+function renderLobby(){
+  const players = activePlayers();
+  const host = isHost();
+  const c = el(`
+    <div class="screen stack">
+      <div class="ticket center">
+        <div class="muted">ROOM CODE — SHARE WITH FRIENDS</div>
+        <div class="code-display">${me.room}</div>
+        <span class="pill"><span class="dot"></span> ${players.length} joined</span>
+      </div>
+      <div class="card stack">
+        <label>Who's here</label>
+        <ul class="player-list" id="pList"></ul>
+      </div>
+      ${host ? `
+      <div class="card stack">
+        <label>Awards per player</label>
+        <div class="btn-row" id="ppRow">
+          ${[1,2,3].map(n=>`<button class="btn ${((room.settings?.promptsPerPlayer||2)===n)?'btn-gold':'btn-outline'} btn-sm" data-n="${n}" style="flex:1">${n}</button>`).join('')}
+        </div>
+        <button class="btn btn-pink" id="startBtn" ${players.length<2?'disabled':''}>Start the game</button>
+        ${players.length<2 ? '<p class="muted center">Need at least 2 players.</p>' : ''}
+      </div>
+      ` : `<p class="muted center">Waiting for the host to start…</p>`}
+      <p class="muted center"><span class="linklike" id="leaveLink">Leave room</span></p>
+    </div>
+  `);
+  const list = c.querySelector('#pList');
+  players.forEach(p=>{
+    list.appendChild(el(`<li class="player-row">${p.name}${p.id===room.hostId?'<span class="tag">HOST</span>':''}${p.id===me.id?'<span class="tag">YOU</span>':''}</li>`));
+  });
+  if(host){
+    let chosen = room.settings?.promptsPerPlayer || 2;
+    c.querySelectorAll('#ppRow button').forEach(btn=>{
+      btn.onclick = ()=>{
+        chosen = parseInt(btn.dataset.n);
+        roomRef().child('settings/promptsPerPlayer').set(chosen);
+      };
+    });
+    c.querySelector('#startBtn').onclick = ()=>startGame(chosen);
+  }
+  c.querySelector('#leaveLink').onclick = leaveRoom;
+  return c;
+}
+
+function renderSubmit(){
+  const per = room.settings?.promptsPerPlayer || 2;
+  const mine = Object.entries(room.prompts||{}).filter(([id,p])=>p.authorId===me.id);
+  const total = Object.keys(room.prompts||{}).length;
+  const players = activePlayers();
+  const done = players.filter(pl=>{
+    const cnt = Object.values(room.prompts||{}).filter(p=>p.authorId===pl.id).length;
+    return cnt >= per;
+  }).length;
+
+  const c = el(`
+    <div class="screen stack">
+      <div class="card stack">
+        <label>Write your awards (${mine.length}/${per})</label>
+        <p class="muted" style="margin:-6px 0 0">Think "most likely to…". Nobody will know you wrote these.</p>
+        ${mine.length < per ? `
+        <div class="prompt-input-row">
+          <input type="text" id="pInput" placeholder="Most likely to…" maxlength="60">
+          <button class="icon-btn" id="addBtn">+</button>
+        </div>` : `<p class="muted">✅ You're all set — waiting on others.</p>`}
+        <ul class="my-prompts" id="mineList"></ul>
+      </div>
+      <div class="card">
+        <div class="row"><label style="margin:0">Players ready</label><span class="muted">${done}/${players.length}</span></div>
+        <div class="progress-track"><div class="progress-fill" style="width:${players.length?(done/players.length*100):0}%"></div></div>
+      </div>
+      ${isHost() ? `<button class="btn btn-pink" id="closeSubmitBtn">Start voting now</button><p class="muted center">You can start early even if not everyone's done.</p>` : ''}
+    </div>
+  `);
+  const mineList = c.querySelector('#mineList');
+  mine.forEach(([id,p])=>{
+    mineList.appendChild(el(`<li><span>${p.text}</span><button data-id="${id}">✕</button></li>`));
+  });
+  mineList.querySelectorAll('button').forEach(b=>{
+    b.onclick = ()=>removePrompt(b.dataset.id);
+  });
+  if(mine.length < per){
+    const input = c.querySelector('#pInput');
+    const add = ()=>{
+      if(myPromptCount() >= per) return toast(`Max ${per} awards.`);
+      addPrompt(input.value);
+      input.value='';
+    };
+    c.querySelector('#addBtn').onclick = add;
+    input.addEventListener('keydown', e=>{ if(e.key==='Enter') add(); });
+  }
+  if(isHost()){
+    c.querySelector('#closeSubmitBtn').onclick = ()=>{
+      if(total < 2) return toast("Need at least 2 awards submitted.");
+      beginVoting();
+    };
+  }
+  return c;
+}
+
+function renderVote(){
+  const p = currentPrompt();
+  if(!p){ return el(`<div class="screen center muted">Loading next award…</div>`); }
+  const players = activePlayers();
+  const votes = votesForCurrent();
+  const myVote = votes[me.id] || myVoteLocal;
+  const votedCount = Object.keys(votes).length;
+
+  const c = el(`
+    <div class="screen stack">
+      <div class="award-title-wrap">
+        <span class="eyebrow-emoji">${emojiFor(p.text)}</span>
+        <div class="award-title">${p.text}</div>
+        <div class="award-sub">Award ${room.currentIndex+1} of ${room.promptOrder.length} — vote for who fits best</div>
+      </div>
+      <div class="vote-grid" id="voteGrid"></div>
+      <div class="card">
+        <div class="row"><label style="margin:0">Votes in</label><span class="muted">${votedCount}/${players.length}</span></div>
+        <div class="progress-track"><div class="progress-fill" style="width:${players.length?(votedCount/players.length*100):0}%"></div></div>
+        <p class="muted" style="margin-top:10px">Votes stay hidden until everyone's in.</p>
+      </div>
+      ${isHost() ? `<button class="btn ${allVoted()?'btn-gold':'btn-outline'}" id="revealBtn">${allVoted()?'Reveal the winner':'Reveal now anyway'}</button>` : ''}
+    </div>
+  `);
+  const grid = c.querySelector('#voteGrid');
+  players.forEach(pl=>{
+    const selected = myVote === pl.id;
+    const btn = el(`<button class="vote-btn ${selected?'selected':''}"><span>${pl.name}</span>${selected?'<span>✓</span>':''}</button>`);
+    btn.onclick = ()=>castVote(pl.id);
+    grid.appendChild(btn);
+  });
+  if(isHost()){
+    c.querySelector('#revealBtn').onclick = revealCurrent;
+  }
+  return c;
+}
+
+function renderReveal(){
+  const idx = room.currentIndex;
+  const promptId = room.promptOrder[idx];
+  const p = { id: promptId, ...room.prompts[promptId] };
+  const result = (room.results||{})[promptId] || {};
+  const players = activePlayers();
+  const winner = players.find(pl=>pl.id===result.winnerId);
+  const tallyEntries = Object.entries(result.tally||{})
+    .sort((a,b)=>b[1]-a[1]);
+
+  const c = el(`
+    <div class="screen stack">
+      <div class="award-title-wrap">
+        <span class="eyebrow-emoji">${emojiFor(p.text)}</span>
+        <div class="award-title">${p.text}</div>
+      </div>
+      <div class="ticket reveal-winner">
+        <span class="trophy">🏆</span>
+        <div class="winner-name">${winner ? winner.name : '—'}</div>
+        <div class="muted">${winner ? (result.tally[winner.id]||0) + ' vote(s)' : 'No votes cast'}</div>
+      </div>
+      <div class="card">
+        <label>Full results</label>
+        ${tallyEntries.map(([pid,count])=>{
+          const pl = players.find(x=>x.id===pid);
+          return `<div class="tally-row"><span>${pl?pl.name:'—'}</span><span>${count}</span></div>`;
+        }).join('') || '<p class="muted">Nobody voted.</p>'}
+      </div>
+      ${isHost() ? `<button class="btn btn-pink" id="nextBtn">${idx+1 >= room.promptOrder.length ? 'See final results' : 'Next award'}</button>`
+                 : `<p class="muted center">Waiting for the host to continue…</p>`}
+    </div>
+  `);
+  if(isHost()){
+    c.querySelector('#nextBtn').onclick = nextAward;
+  }
+  return c;
+}
+
+function renderEnd(){
+  const players = activePlayers();
+  const wins = {};
+  players.forEach(p=>wins[p.id]=0);
+  Object.entries(room.results||{}).forEach(([pid,r])=>{
+    if(r.winnerId && wins[r.winnerId] !== undefined) wins[r.winnerId]++;
+  });
+  const ranked = players.slice().sort((a,b)=>(wins[b.id]||0)-(wins[a.id]||0));
+  const recap = (room.promptOrder||[]).map(pid=>{
+    const p = room.prompts[pid];
+    const r = (room.results||{})[pid] || {};
+    const winner = players.find(pl=>pl.id===r.winnerId);
+    return { text:p?.text, winner: winner?winner.name:'—' };
+  });
+
+  const c = el(`
+    <div class="screen stack">
+      <div class="ticket center">
+        <span class="trophy">🎉</span>
+        <div class="award-title">THAT'S A WRAP</div>
+        <div class="muted">Here's how it played out</div>
+      </div>
+      <div class="card stack">
+        <label>Most awarded</label>
+        <ul class="final-list" id="rankList"></ul>
+      </div>
+      <div class="card stack">
+        <label>Full recap</label>
+        <ul class="final-list" id="recapList"></ul>
+      </div>
+      ${isHost() ? `<button class="btn btn-gold" id="againBtn">Play again</button>` : ''}
+      <p class="muted center"><span class="linklike" id="leaveLink2">Leave room</span></p>
+    </div>
+  `);
+  const rankList = c.querySelector('#rankList');
+  ranked.forEach((p,i)=>{
+    rankList.appendChild(el(`<li><div class="ft">#${i+1}</div><div class="fn">${p.name} — ${wins[p.id]||0} award${wins[p.id]===1?'':'s'}</div></li>`));
+  });
+  const recapList = c.querySelector('#recapList');
+  recap.forEach(r=>{
+    recapList.appendChild(el(`<li><div class="ft">${r.text}</div><div class="fn" style="font-size:18px">${r.winner}</div></li>`));
+  });
+  if(isHost()) c.querySelector('#againBtn').onclick = resetGame;
+  c.querySelector('#leaveLink2').onclick = leaveRoom;
+  return c;
+}
+
+/* ====================== ADMIN PANEL ====================== */
+function renderAdminFab(){
+  const b = el(`<button class="admin-fab" id="adminFab">⚙️</button>`);
+  b.onclick = ()=>{ adminOpen = true; render(); };
+  return b;
+}
+function renderAdminSheet(){
+  const overlay = el(`<div class="admin-sheet"></div>`);
+  overlay.onclick = (e)=>{ if(e.target===overlay){ adminOpen=false; render(); } };
+
+  const players = activePlayers();
+  const panel = el(`
+    <div class="admin-panel" style="position:relative">
+      <button class="close-x" id="adminClose">✕</button>
+      <h3>Host controls</h3>
+      <p class="muted">Only you can see this.</p>
+
+      <div class="admin-section">
+        <h4>Players</h4>
+        <ul class="player-list" id="adminPlayers"></ul>
+      </div>
+
+      ${room.phase==='vote' ? `
+      <div class="admin-section stack">
+        <h4>This award</h4>
+        <button class="btn btn-outline btn-sm" id="skipBtn">Skip this award (no reveal)</button>
+      </div>` : ''}
+
+      <div class="admin-section stack">
+        <h4>Room</h4>
+        <button class="btn btn-outline btn-sm" id="resetBtn">Reset & play again</button>
+        <button class="btn btn-outline btn-sm" id="endBtn" style="color:var(--red); border-color:var(--red)">End & delete room</button>
+      </div>
+    </div>
+  `);
+  const list = panel.querySelector('#adminPlayers');
+  players.forEach(p=>{
+    const row = el(`<li class="player-row"><span>${p.name}${p.id===me.id?' (you)':''}</span></li>`);
+    if(p.id !== me.id){
+      const kb = el(`<button class="kick">Remove</button>`);
+      kb.onclick = ()=>kickPlayer(p.id);
+      row.appendChild(kb);
+    }
+    list.appendChild(row);
+  });
+  panel.querySelector('#adminClose').onclick = ()=>{ adminOpen=false; render(); };
+  panel.querySelector('#resetBtn').onclick = resetGame;
+  panel.querySelector('#endBtn').onclick = endGameFully;
+  const skipBtn = panel.querySelector('#skipBtn');
+  if(skipBtn) skipBtn.onclick = forceSkipPrompt;
+
+  overlay.appendChild(panel);
+  return overlay;
+}
+
+/* ====================== BOOT ====================== */
+(function boot(){
+  if(me.id && me.room){
+    watchRoom(me.room);
+  } else {
+    render();
+  }
+})();
+</script>
+</body>
+</html>
