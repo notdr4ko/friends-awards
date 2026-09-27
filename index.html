@@ -233,6 +233,40 @@
     text-align:center; font-size:11px; color:var(--paper-dim); opacity:0.6;
     pointer-events:none; z-index:5;
   }
+
+  .ticket-mark{cursor:pointer; user-select:none;}
+
+  .secret-overlay{
+    position:fixed; inset:0; z-index:60;
+    background:rgba(6,4,18,0.82);
+    display:flex; align-items:center; justify-content:center;
+    overflow:hidden; padding:20px;
+  }
+  .secret-card{
+    position:relative; z-index:2; max-width:420px; width:100%;
+    animation:rise .35s ease both;
+  }
+  .mog-stage{
+    position:relative; width:100%; aspect-ratio:1416/802;
+    border-radius:16px; overflow:hidden; background:#000;
+    border:1px solid var(--line);
+  }
+  .mog-img{
+    position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
+    opacity:0;
+  }
+  #mogBase{ opacity:1; }
+  .mog-final.show{ opacity:1; }
+  .mog-final.fade-away{ opacity:0; transition:opacity 1.1s ease; }
+  .mog-eyes-text{
+    position:absolute; top:52%; left:50%; transform:translate(-50%,-50%) rotate(-2deg);
+    font-family:'Arial Black', Arial, sans-serif; font-weight:900;
+    color:#e11d1d; font-size:clamp(22px, 9vw, 46px); letter-spacing:-0.01em;
+    text-shadow: 2px 2px 0 #000, -1px -1px 0 #000;
+    white-space:nowrap; opacity:0; transition:opacity .6s ease;
+  }
+  .mog-eyes-text.show{ opacity:1; }
+  @media (prefers-reduced-motion: reduce){ .mog-eyes-text, .mog-final{ transition:none; } }
 </style>
 </head>
 <body>
@@ -271,6 +305,9 @@ let room = null;          // live room object from Firebase
 let unsub = null;         // current db listener detach fn
 let myVoteLocal = null;   // locally selected vote before it's confirmed
 let adminOpen = false;
+let secretOpen = false;
+let trophyClicks = 0;
+let trophyClickTimer = null;
 
 function uid(){
   return 'p_' + Math.random().toString(36).slice(2,10);
@@ -509,42 +546,113 @@ function render(){
 
   if(!room){
     app.appendChild(renderLanding());
-    return;
+  } else {
+    const wrap = document.createElement('div');
+    wrap.appendChild(renderBrand());
+
+    switch(room.phase){
+      case 'lobby': wrap.appendChild(renderLobby()); break;
+      case 'submit': wrap.appendChild(renderSubmit()); break;
+      case 'vote': wrap.appendChild(renderVote()); break;
+      case 'reveal': wrap.appendChild(renderReveal()); break;
+      case 'end': wrap.appendChild(renderEnd()); break;
+      default: wrap.appendChild(renderLobby());
+    }
+    app.appendChild(wrap);
+
+    if(isHost()){
+      app.appendChild(renderAdminFab());
+      if(adminOpen) app.appendChild(renderAdminSheet());
+    }
   }
 
-  const wrap = document.createElement('div');
-  wrap.appendChild(renderBrand());
+  if(secretOpen) app.appendChild(renderSecretOverlay());
+}
 
-  switch(room.phase){
-    case 'lobby': wrap.appendChild(renderLobby()); break;
-    case 'submit': wrap.appendChild(renderSubmit()); break;
-    case 'vote': wrap.appendChild(renderVote()); break;
-    case 'reveal': wrap.appendChild(renderReveal()); break;
-    case 'end': wrap.appendChild(renderEnd()); break;
-    default: wrap.appendChild(renderLobby());
-  }
-  app.appendChild(wrap);
-
-  if(isHost()){
-    app.appendChild(renderAdminFab());
-    if(adminOpen) app.appendChild(renderAdminSheet());
+function handleTrophyClick(){
+  trophyClicks++;
+  clearTimeout(trophyClickTimer);
+  trophyClickTimer = setTimeout(()=>{ trophyClicks = 0; }, 1500);
+  if(trophyClicks >= 7){
+    trophyClicks = 0;
+    secretOpen = true;
+    render();
   }
 }
 
+function stopMogAudio(){
+  if(window._mogChou){ window._mogChou.pause(); window._mogChou = null; }
+  if(window._mogSound){ window._mogSound.pause(); window._mogSound = null; }
+}
+
+function closeSecret(){
+  stopMogAudio();
+  secretOpen = false;
+  render();
+}
+
+function renderSecretOverlay(){
+  const overlay = el(`<div class="secret-overlay"></div>`);
+  overlay.onclick = (e)=>{ if(e.target===overlay){ closeSecret(); } };
+
+  const card = el(`
+    <div class="secret-card">
+      <button class="close-x" id="secretClose">✕</button>
+      <div class="mog-stage">
+        <img class="mog-img" id="mogBase" src="mogger.png" alt="">
+        <div class="mog-eyes-text" id="mogText">MOGGED!</div>
+        <img class="mog-img mog-final" id="mogFinal" src="mogged-face.png" alt="">
+      </div>
+    </div>
+  `);
+  card.querySelector('#secretClose').onclick = closeSecret;
+  overlay.appendChild(card);
+
+  // --- timed sequence ---
+  const textEl = card.querySelector('#mogText');
+  const finalImg = card.querySelector('#mogFinal');
+
+  const chou = new Audio('chou.mp3');
+  const moggedSound = new Audio('mogged-sound.mp3');
+  window._mogChou = chou;
+  window._mogSound = moggedSound;
+
+  chou.play().catch(()=>{});
+
+  setTimeout(()=>{ textEl.classList.add('show'); }, 900);
+
+  let switched = false;
+  chou.addEventListener('timeupdate', ()=>{
+    if(!switched && chou.currentTime >= 3){
+      switched = true;
+      moggedSound.play().catch(()=>{});
+      finalImg.classList.add('show'); // sudden cut, no fade in
+      setTimeout(()=>{
+        finalImg.classList.add('fade-away'); // fades out on its own
+        setTimeout(()=>{ if(secretOpen) closeSecret(); }, 1200);
+      }, 2200);
+    }
+  });
+
+  return overlay;
+}
+
 function renderBrand(){
-  return el(`
+  const brand = el(`
     <div class="brand">
-      <div class="ticket-mark">🏆</div>
+      <div class="ticket-mark" id="trophyClickTarget">🏆</div>
       <h1>THE <span>AWARDS</span></h1>
     </div>
   `);
+  brand.querySelector('#trophyClickTarget').onclick = handleTrophyClick;
+  return brand;
 }
 
 function renderLanding(){
   const c = el(`
     <div class="screen stack">
       <div class="brand">
-        <div class="ticket-mark">🏆</div>
+        <div class="ticket-mark" id="trophyClickTarget">🏆</div>
         <h1>THE <span>AWARDS</span></h1>
       </div>
       <p class="muted">A superlative-voting party game for your friend group. Everyone writes the awards. Everyone votes who fits. Nobody knows who wrote what.</p>
@@ -564,6 +672,7 @@ function renderLanding(){
       </div>
     </div>
   `);
+  c.querySelector('#trophyClickTarget').onclick = handleTrophyClick;
   c.querySelector('#hostBtn').onclick = ()=>{
     const name = c.querySelector('#nameInput').value;
     if(!name.trim()) return toast("Enter your name first.");
